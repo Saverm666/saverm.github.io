@@ -1,0 +1,4 @@
+/* 修改首页中间副标题（打字机文字）颜色 */
+.first-screen-container .first-screen-content .description .desc-item .desc {
+    color: #0d67ba !important;  
+}
