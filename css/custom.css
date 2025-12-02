@@ -1,4 +1,25 @@
-/* 修改首页中间副标题（打字机文字）颜色 */
+@import url('https://fonts.googleapis.com/css2?family=Long+Cang&family=Noto+Serif+SC:wght@400;700&display=swap');
+
+.first-screen-container .first-screen-content .description {
+    background: none !important;
+    backdrop-filter: none;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+    margin-top: 25px;
+}
+
 .first-screen-container .first-screen-content .description .desc-item .desc {
-    color: #0d67ba !important;  
+    font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif !important;
+    /* font-family: 'Long Cang', cursive !important; */
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.first-screen-container .first-screen-content .bottom-placeholder .sc-icon-list .sc-icon-item i {
+    font-size: var(--first-screen-icon-size);
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }

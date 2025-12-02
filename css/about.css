@@ -1,0 +1,183 @@
+/* ==========================================================================
+   About Page Custom Styles
+   Theme Color: #0066cc (Matches config)
+   Style: Minimalist Card Design
+   ========================================================================== */
+
+:root {
+    --primary-color: #0066cc;
+    --primary-light: #e6f0ff;
+    --text-main: #333333;
+    --text-secondary: #666666;
+    --card-bg: #ffffff;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --hover-shadow: 0 8px 30px rgba(0, 102, 204, 0.15);
+    --radius: 12px;
+}
+
+/* Container Layout */
+.about-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Common Card Style */
+.profile-card, .content-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.profile-card:hover, .content-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
+}
+
+/* Profile Section Specifics */
+.profile-card {
+    text-align: center;
+}
+
+.avatar-box img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--primary-light);
+    object-fit: cover;
+    margin-bottom: 15px;
+    transition: transform 0.5s ease;
+}
+
+.avatar-box img:hover {
+    transform: rotate(360deg);
+}
+
+.name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 10px 0 5px;
+}
+
+.bio {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+/* Social Buttons */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-btn {
+    padding: 8px 24px;
+    border-radius: 20px;
+    text-decoration: none !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.social-btn.github {
+    background-color: #24292e;
+    color: white;
+}
+
+.social-btn.email {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.social-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+/* Content Sections */
+.section-title {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--primary-color);
+    padding-left: 12px;
+    color: var(--text-main);
+}
+
+.content-card p {
+    line-height: 1.8;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+/* Skill Tags */
+.skill-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-tag {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.skill-tag:hover {
+    background-color: var(--primary-color);
+    color: white;
+    cursor: default;
+}
+
+/* Goal List */
+.goal-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.goal-list li {
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee;
+    color: var(--text-secondary);
+}
+
+.goal-list li:last-child {
+    border-bottom: none;
+}
+
+/* Dark Mode Adaptation (Hexo Keep specific) */
+/* Keep 主题通常会在 html 或 body 标签上添加 'dark-mode' 类 */
+html.dark-mode .profile-card,
+html.dark-mode .content-card {
+    background: #2c2c2c; /* Adjust based on theme dark bg */
+    border-color: #3a3a3a;
+}
+
+html.dark-mode .name,
+html.dark-mode .section-title {
+    color: #e0e0e0;
+}
+
+html.dark-mode .bio,
+html.dark-mode .content-card p,
+html.dark-mode .goal-list li {
+    color: #a0a0a0;
+}
+
+html.dark-mode .skill-tag {
+    background-color: #1f2d3d;
+    color: #5c9eff;
+}
