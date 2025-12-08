@@ -231,44 +231,517 @@
             <!-- page content -->
             <div class="page-content border-box keep-markdown-body ">
                 
-                    <div class="about-wrapper">
-<div class="profile-card">
-<div class="avatar-box">
-<img     src="/images/avatar.jpg"   alt="Saverm">
-</div>
-<h2 class="name">Saverm</h2>
-<p class="bio">快来跟我签订契约成为魔法少女吧。</p>
-<div class="social-links">
-<a class="link"   href="https://github.com/Saverm666"  target="_blank" class="social-btn github">Github<i class="fas fa-external-link-alt"></i></a>
-<a class="link"   href="mailto:Saverm666@gmail.com"  class="social-btn email">Email<i class="fas fa-external-link-alt"></i></a>
-</div>
+                    
+<style>
+  /* === 字体定义 === */
+  @font-face {
+    font-family: 'WitchRunes';
+    src: url('/fonts/MadokaRunes.ttf') format('truetype'); 
+  }
+
+  /* === 全局变量 === */
+  :root {
+    --primary-color: #38649f;
+    --text-main: #333;
+    --text-sub: #666;
+    --witch-color: #e74c3c;
+    --sayaka-blue: #24b7dc; 
+  }
+
+  /* === 基础布局 === */
+  .about-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 960px;
+    margin: 30px auto;
+    font-family: -apple-system, sans-serif;
+    align-items: flex-start;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  /* === 通用卡片组件 === */
+  .my-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.02);
+  }
+
+  /* === 左侧个人信息栏 === */
+  .left-col {
+    flex: 0 0 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: sticky;
+    top: 20px;
+    z-index: 10;
+  }
+
+  .avatar-wrap {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    padding: 4px;
+    background: #fff;
+    border: 1px solid #eee;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s;
+  }
+
+  .name-txt {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 5px 0 8px 0;
+  }
+
+  .bio-txt {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    margin-bottom: 20px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .my-btn {
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-decoration: none !important;
+    color: var(--text-main);
+    background: #f0f2f5;
+    transition: 0.2s;
+  }
+  .my-btn:hover { background: #e1e4e8; }
+
+  /* === 右侧内容栏 === */
+  .right-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left !important;
+  }
+
+  .custom-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center; 
+  }
+
+  .custom-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 18px;
+    background: var(--primary-color);
+    margin-right: 12px;
+    border-radius: 2px;
+  }
+
+  .desc-txt {
+    color: var(--text-sub);
+    margin: 0;
+    line-height: 1.8;
+  }
+
+  .tags-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .my-tag {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #f4f5f7;
+    color: #555;
+  }
+  .my-tag:first-child { background: #e8f4fd; color: #3498db; }
+  .my-tag:nth-child(2) { background: #fdf0e8; color: #e67e22; }
+
+  .simple-list {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--text-sub);
+  }
+
+  .simple-list li {
+    margin-bottom: 8px;
+  }
+
+  /* === 魔女化彩蛋样式 === */
+  .witch-mode-text {
+    font-family: 'WitchRunes', sans-serif !important;
+    font-size: 1.4em;
+    /* 增加字间距以防止魔女文字（Runes）互相重叠 */
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    /* 强制取消加粗，防止复杂字体在高字重下模糊 */
+    font-weight: normal !important;
+    line-height: 1.4;
+  }
+
+  /* === 全屏覆盖层 (打字机容器) === */
+  #typewriter-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;           
+    justify-content: center; 
+    align-items: center;     
+    z-index: 2147483647;     
+    pointer-events: none;    
+    background: transparent;
+  }
+
+  /* 文字主体 */
+  #typewriter-text {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--sayaka-blue);
+    font-family: 'Songti SC', 'SimSun', 'Times New Roman', serif;
+    text-shadow: 0 0 15px rgba(146, 223, 243, 0.6);
+    white-space: nowrap;
+    opacity: 0; 
+    transition: opacity 0.5s;
+  }
+
+  /* 字符碎片 (用于破碎动画) */
+  .char-shard {
+    display: inline-block;
+    transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 1.5s ease-out, filter 1.5s ease-out;
+    transform-origin: center center;
+    backface-visibility: hidden;
+  }
+
+  /* 光标闪烁 */
+  .cursor-blink {
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background-color: var(--sayaka-blue);
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+    margin-left: 5px;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* === 响应式适配 === */
+  @media (max-width: 768px) {
+    .about-wrapper { flex-direction: column; }
+    .left-col { width: 100% !important; position: static; }
+    #typewriter-text { font-size: 1.5rem; width: 90%; text-align: center; white-space: normal;}
+    /* 移动端减小间距以适应窄屏 */
+    .witch-mode-text { letter-spacing: 3px; font-size: 1.2em; }
+  }
+</style>
+
+<div class="about-wrapper">
+  
+  <div class="my-card left-col">
+    <div class="avatar-wrap">
+      <img     src="/images/avatar.jpg"   alt="Saverm">
+    </div>
+    
+    <div class="name-txt" id="my-name">Saverm</div>
+    
+    <div class="bio-txt">
+      快来跟我签订契约成为<span id="easter-egg-btn" style="cursor: text; user-select: none;">魔法少女</span>吧。
+    </div>
+    
+    <div class="btn-row">
+      <a class="link"   href="https://github.com/Saverm666"  target="_blank" class="my-btn">Github<i class="fas fa-external-link-alt"></i></a>
+      <a class="link"   href="mailto:Saverm666@gmail.com"  class="my-btn">Email<i class="fas fa-external-link-alt"></i></a>
+    </div>
+  </div>
+
+  <div class="right-col">
+    
+    <div class="my-card">
+      <div class="custom-title">Hello World</div>
+      <p class="desc-txt">
+        电子科技大学，软件工程，大二在读，深度学习初学。
+      </p>
+    </div>
+
+    <div class="my-card">
+      <div class="custom-title">技术栈</div>
+      <div class="tags-box">
+        <span class="my-tag">Python</span>
+        <span class="my-tag">PyTorch</span>
+      </div>
+    </div>
+
+    <div class="my-card">
+      <div class="custom-title">近期正在...</div>
+      <ul class="simple-list">
+        <li>跑实验</li>
+        <li>考试</li>
+        <li>八点起</li>
+        <li>跑3.5千米刷锻</li>
+      </ul>
+    </div>
+
+  </div>
 </div>
 
-<div class="content-card">
-<h3 class="section-title">👋 Hello World</h3>
-<p>
-电子科技大学，软件工程，大二在读，深度学习初学者。
-</p>
+<div id="typewriter-overlay">
+  <div id="typewriter-text"></div>
 </div>
 
-<div class="content-card">
-<h3 class="section-title">技术栈</h3>
-<div class="skill-box">
-<span class="skill-tag">Python</span>
-<span class="skill-tag">PyTorch</span>
-</div>
-</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    /**
+     * 全局配置常量
+     * 定义彩蛋触发阈值、资源路径及动画参数
+     */
+    
+    const CONFIG = {
+      CLICK_THRESHOLD: 5,                  // 触发彩蛋所需的点击次数
+      NEW_BIO_TEXT: 'Hexe',                // 魔女化后的简介文本 (德语: 魔女)
+      NEW_NAME_TEXT: 'OktaviavonSeckendorff', // 魔女化后的名字
+      THEME_COLOR: '#e74c3c',              // 主题色变化
+      NEW_AVATAR_PATH: '/images/avatar_witch.png', 
+      FADE_DURATION: 200,                  // 头像渐变时间 (ms)
+      
+      BGM_PATH: '/audio/majo_bgm.mp3',          
+      VOICE_PATH: '/audio/sayaka_baka.mp3',    
+      BGM_VOLUME: 0.2,
+      VOICE_VOLUME: 0.8,                        
+      
+      TYPEWRITER_TEXT: '我，真是个笨蛋',    // 打字机显示的台词
+      TYPE_SPEED: 500,                     // 打字速度 (ms/char)
+      SHATTER_DELAY: 2000,                 // 文字破碎前的等待时间 (ms)
+      SHATTER_DISTANCE: 150,                // 文字破碎的扩散距离 (px)
+      
+      // [新增] 韵律映射表 (单位: ms)
+      // 对应字符: ['我', '，', '真', '是', '个', '笨', '蛋']
+      TYPE_RHYTHM: [800, 1200, 250, 250, 550, 250, 250],
+      SHATTER_DELAY: 2000, // 稍微延长破碎等待，让用户回味最后一个字
+      SHATTER_DISTANCE: 150
+    };
 
-<div class="content-card">
-<h3 class="section-title">近期正在努力...</h3>
-<ul class="goal-list">
-<li>跑实验</li>
-<li>考试</li>
-<li>八点起</li>
-<li>跑3.5千米刷锻</li>
-</ul>
-</div>
-</div>
+    // DOM 元素引用
+    const elements = {
+      triggerBtn: document.getElementById('easter-egg-btn'),
+      nameLabel: document.getElementById('my-name'),
+      avatarImg: document.querySelector('.avatar-wrap img'),
+      overlay: document.getElementById('typewriter-overlay'),
+      textContainer: document.getElementById('typewriter-text')
+    };
+
+    // 确保 Overlay 位于 Body 末尾，防止被其他 stacking context 遮挡
+    if (elements.overlay) {
+      document.body.appendChild(elements.overlay);
+    }
+    
+    // 状态管理
+    let clickCount = 0;
+    let bgmInstance = null;
+    let voiceInstance = null;
+    
+    // 初始化事件监听
+    elements.triggerBtn.addEventListener('click', handleEggClick);
+
+    /**
+     * 处理触发按钮的点击事件
+     * 累计点击次数，达到阈值时触发彩蛋
+     */
+    function handleEggClick() {
+      if (clickCount >= CONFIG.CLICK_THRESHOLD) return;
+      clickCount++;
+      if (clickCount === CONFIG.CLICK_THRESHOLD) {
+        triggerEvilMode();
+      }
+    }
+
+    /**
+     * 触发“魔女化”模式的主控函数
+     * 协调 UI 变更、音频播放和动画序列
+     */
+    function triggerEvilMode() {
+      // 1. 变更文本样式
+      applyWitchStyle(elements.triggerBtn, CONFIG.NEW_BIO_TEXT);
+      applyWitchStyle(elements.nameLabel, CONFIG.NEW_NAME_TEXT);
+      elements.nameLabel.style.textShadow = '0 0 5px rgba(255, 0, 0, 0.5)';
+      
+      // 2. 变更头像
+      swapAvatar(elements.avatarImg, CONFIG.NEW_AVATAR_PATH);
+      
+      // 3. 播放音频
+      playAudioGroup();
+
+      // 4. 启动打字机动画序列
+      typeWriterEffect(CONFIG.TYPEWRITER_TEXT, elements.textContainer, () => {
+        setTimeout(() => {
+          triggerShatter(elements.textContainer, elements.overlay);
+        }, CONFIG.SHATTER_DELAY);
+      });
+    }
+
+    /**
+     * 应用魔女字体样式
+     * @param {HTMLElement} element - 需要修改样式的 DOM 元素
+     * @param {string} text - 新的文本内容
+     */
+    function applyWitchStyle(element, text) {
+      element.innerText = text;
+      element.style.color = CONFIG.THEME_COLOR;
+      element.classList.add('witch-mode-text');
+    }
+
+    /**
+     * 执行头像渐变切换
+     * @param {HTMLImageElement} imgElement - 头像 Image 元素
+     * @param {string} newSrc - 新头像的路径
+     */
+    function swapAvatar(imgElement, newSrc) {
+      imgElement.style.opacity = '0';
+      setTimeout(() => {
+        imgElement.src = newSrc;
+        // 确保图片加载完成后再显示，避免闪烁
+        imgElement.onload = () => { imgElement.style.opacity = '1'; };
+        // 兜底逻辑：防止 onload 不触发
+        setTimeout(() => { imgElement.style.opacity = '1'; }, 100);
+      }, CONFIG.FADE_DURATION);
+    }
+
+    /**
+     * 初始化并播放音频组 (BGM + 语音)
+     */
+    function playAudioGroup() {
+      try {
+        if (!bgmInstance) {
+          bgmInstance = new Audio(CONFIG.BGM_PATH);
+          bgmInstance.volume = CONFIG.BGM_VOLUME;
+          bgmInstance.loop = false; 
+          bgmInstance.play().catch(console.warn); // 捕获自动播放策略限制的错误
+        }
+        if (!voiceInstance) {
+          voiceInstance = new Audio(CONFIG.VOICE_PATH);
+          voiceInstance.volume = CONFIG.VOICE_VOLUME;
+          voiceInstance.play().catch(console.warn);
+        }
+      } catch (e) { console.error('Audio error:', e); }
+    }
+
+    /**
+     * 逐字打字机效果
+     * @param {string} text - 要显示的完整文本
+     * @param {HTMLElement} container - 文本容器
+     * @param {Function} onComplete - 动画完成后的回调函数
+     */
+    /**
+     * 逐字打字机效果 (支持自定义韵律)
+     * @param {string} text - 要显示的完整文本
+     * @param {HTMLElement} container - 文本容器
+     * @param {Function} onComplete - 动画完成后的回调函数
+     */
+    function typeWriterEffect(text, container, onComplete) {
+      container.style.opacity = '1';
+      container.innerHTML = ''; 
+      
+      let index = 0;
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor-blink';
+      cursor.innerHTML = '&nbsp;'; 
+      
+      function type() {
+        if (index < text.length) {
+          const char = text.charAt(index);
+          const charSpan = document.createElement('span');
+          charSpan.innerText = char;
+          charSpan.className = 'char-shard'; 
+          
+          container.insertBefore(charSpan, cursor); 
+          
+          // [核心修改] 获取当前字符的特定延迟时间
+          // 如果配置了韵律数组且索引有效，则使用数组值；否则使用基础速度+随机扰动
+          let currentDelay;
+          
+          if (CONFIG.TYPE_RHYTHM && CONFIG.TYPE_RHYTHM[index] !== undefined) {
+             // 使用预设韵律 (精确控制)
+             currentDelay = CONFIG.TYPE_RHYTHM[index];
+          } else {
+             // 使用随机速度 (兜底逻辑)
+             currentDelay = CONFIG.TYPE_SPEED + (Math.random() * 100 - 50);
+          }
+
+          index++;
+          setTimeout(type, currentDelay);
+        } else {
+          if(!container.contains(cursor)) container.appendChild(cursor);
+          if (onComplete) onComplete();
+        }
+      }
+      
+      container.appendChild(cursor);
+      type();
+    }
+
+    /**
+     * 触发文字破碎散开动画
+     * @param {HTMLElement} textContainer - 包含字符碎片的容器
+     * @param {HTMLElement} overlayContainer - 全屏遮罩层容器
+     */
+    function triggerShatter(textContainer, overlayContainer) {
+      const cursor = textContainer.querySelector('.cursor-blink');
+      if (cursor) cursor.style.display = 'none';
+
+      const shards = textContainer.querySelectorAll('.char-shard');
+      
+      shards.forEach(shard => {
+        // 计算随机的扩散方向和旋转角度
+        const x = (Math.random() - 0.5) * CONFIG.SHATTER_DISTANCE * 2; 
+        const y = (Math.random() - 0.5) * CONFIG.SHATTER_DISTANCE * 2; 
+        const r = (Math.random() - 0.5) * 360; 
+
+        shard.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+        shard.style.opacity = '0';
+        shard.style.filter = 'blur(8px)'; 
+      });
+
+      // 动画结束后清理 DOM
+      setTimeout(() => {
+        textContainer.style.opacity = '0';
+        overlayContainer.style.display = 'none'; 
+      }, 2000); 
+    }
+  });
+</script>
                 
             </div>
 
