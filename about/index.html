@@ -460,47 +460,50 @@
 
   /* === 响应式适配 === */
   @media (max-width: 768px) {
-    /* 容器调整：增加左右内边距，防止卡片贴边 */
+    /* 1. 容器调整：改用 block 布局，消除 Flex 对齐的副作用 */
     .about-wrapper { 
-      flex-direction: column; 
-      padding: 0 16px;        /* 左右增加 16px 间隙 */
-      margin: 20px auto;      /* 减小顶部 Margin */
-      box-sizing: border-box; /* 确保 padding 不会撑大宽度 */
+      display: block !important; /* 强制取消 flex，改用普通文档流 */
+      width: 100% !important;
+      padding: 0 12px;           /* 左右留出一点点安全距离 */
+      margin: 20px auto;
+      box-sizing: border-box;
     }
 
-    /* 左右栏强制占满宽度 */
+    /* 2. 强制所有列宽度占满，并居中 */
     .left-col, .right-col { 
       width: 100% !important; 
-      flex: none;             /* 取消 flex 伸缩，强制由 width 控制 */
-      position: static; 
+      max-width: 100% !important;
+      display: block;
+      margin: 0 auto 20px auto; /* 上0，左右自动(居中)，下20 */
+      padding: 0;
+      position: static;
     }
 
-    /* 左侧栏底部增加间距，与右侧内容分开 */
-    .left-col {
-      margin-bottom: 20px;
-    }
-
-    /* 卡片内部紧凑化：减小内边距 */
+    /* 3. 卡片调整：确保边框计算在宽度内，防止溢出 */
     .my-card {
-      padding: 20px 16px;
+      width: 100%;       /* 强制撑满容器 */
+      padding: 20px;     /* 稍微减小手机端内边距 */
+      box-sizing: border-box; /* 核心：防止 padding 把卡片撑大导致不对齐 */
+      margin: 0;         /* 清除卡片自身可能存在的 margin */
     }
 
-    /* 打字机文字适配：允许换行，调整字号 */
+    /* 4. 头像和名字区域微调 */
+    .avatar-wrap {
+      margin: 0 auto 12px auto; /* 确保头像在卡片里也是居中的 */
+    }
+    
+    /* 5. 字体适配 */
     #typewriter-text { 
-      font-size: 1.6rem; 
-      width: 90%; 
+      font-size: 1.5rem; 
+      width: 100%; 
       text-align: center; 
       white-space: normal;
-      line-height: 1.4;
     }
 
-    /* 魔女文字适配 (关键修复) */
-    /* 之前的 letter-spacing: 3px 会导致长名字撑爆手机屏幕 */
     .witch-mode-text { 
-      letter-spacing: 1px;    /* 减小字间距 */
+      letter-spacing: 1px;
       font-size: 1.2em; 
-      word-break: break-word; /* 允许长单词(如名字)强制换行 */
-      overflow-wrap: break-word;
+      word-break: break-all; /* 暴力换行，防止长名字撑开 */
       white-space: normal;
     }
   }
