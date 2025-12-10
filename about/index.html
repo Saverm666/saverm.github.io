@@ -460,11 +460,49 @@
 
   /* === 响应式适配 === */
   @media (max-width: 768px) {
-    .about-wrapper { flex-direction: column; }
-    .left-col { width: 100% !important; position: static; }
-    #typewriter-text { font-size: 1.5rem; width: 90%; text-align: center; white-space: normal;}
-    /* 移动端减小间距以适应窄屏 */
-    .witch-mode-text { letter-spacing: 3px; font-size: 1.2em; }
+    /* 容器调整：增加左右内边距，防止卡片贴边 */
+    .about-wrapper { 
+      flex-direction: column; 
+      padding: 0 16px;        /* 左右增加 16px 间隙 */
+      margin: 20px auto;      /* 减小顶部 Margin */
+      box-sizing: border-box; /* 确保 padding 不会撑大宽度 */
+    }
+
+    /* 左右栏强制占满宽度 */
+    .left-col, .right-col { 
+      width: 100% !important; 
+      flex: none;             /* 取消 flex 伸缩，强制由 width 控制 */
+      position: static; 
+    }
+
+    /* 左侧栏底部增加间距，与右侧内容分开 */
+    .left-col {
+      margin-bottom: 20px;
+    }
+
+    /* 卡片内部紧凑化：减小内边距 */
+    .my-card {
+      padding: 20px 16px;
+    }
+
+    /* 打字机文字适配：允许换行，调整字号 */
+    #typewriter-text { 
+      font-size: 1.6rem; 
+      width: 90%; 
+      text-align: center; 
+      white-space: normal;
+      line-height: 1.4;
+    }
+
+    /* 魔女文字适配 (关键修复) */
+    /* 之前的 letter-spacing: 3px 会导致长名字撑爆手机屏幕 */
+    .witch-mode-text { 
+      letter-spacing: 1px;    /* 减小字间距 */
+      font-size: 1.2em; 
+      word-break: break-word; /* 允许长单词(如名字)强制换行 */
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
   }
 </style>
 
@@ -490,7 +528,7 @@
   <div class="right-col">
     
     <div class="my-card">
-      <div class="custom-title">Hello World</div>
+      <div class="custom-title">我</div>
       <p class="desc-txt">
         电子科技大学，软件工程，大二在读，深度学习初学。
       </p>
