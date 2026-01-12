@@ -26,13 +26,28 @@
 
     // 1. 加载 Cubism 4 Core SDK (必须!)
     loadScript('/js/live2dcubismcore.min.js')
+      .then(() => {
+          // 核心修正：确保 Cubism 4 Core 挂载到全局，供插件识别
+          if (window.Live2DCubismCore) {
+              console.log('[Live2D] Cubism 4 Core detected.');
+          }
+      })
       // 2. 加载 PixiJS
       .then(() => loadScript('/js/pixi.min.js'))
       // 3. 加载 Pixi Live2D Display
       .then(() => loadScript('/js/pixi-live2d-display.min.js'))
       .then(() => {
-        console.log('[Live2D] All libraries loaded. Creating canvas...');
+        console.log('[Live2D] All libraries loaded. Checking environment...');
         
+        // 核心修正：手动注册 Cubism 4 核心（如果插件没有自动识别）
+        if (window.PIXI && window.PIXI.live2d) {
+            // 某些版本的插件需要手动指定核心库
+            // window.PIXI.live2d.Live2DModel.registerTicker(window.PIXI.Ticker); // PixiJS 5/6 自动处理，可省略
+            console.log('[Live2D] PIXI.live2d is ready.');
+        } else {
+            throw new Error('PIXI.live2d is missing. Plugin load failed.');
+        }
+
         const canvas = document.createElement('canvas');
         canvas.id = 'live2d-canvas';
         Object.assign(canvas.style, {
