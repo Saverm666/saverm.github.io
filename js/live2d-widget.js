@@ -3,10 +3,10 @@
   if (window.innerWidth >= 768) {
     console.log('[Live2D] Initializing...');
 
-    const repo = 'Saverm666/Live2d4Blog';
-    const branch = 'master';
+    // 改用本地路径加载模型，彻底避免 CDN 网络问题
+    // 注意：Hexo 会将 source 目录下的文件夹原样发布到根目录
     const modelName = '美树沙耶香(バレンタイン18)';
-    const modelPath = `https://cdn.jsdelivr.net/gh/${repo}@${branch}/${encodeURIComponent(modelName)}/${encodeURIComponent(modelName)}.model3.json`;
+    const modelPath = `/${encodeURIComponent(modelName)}/${encodeURIComponent(modelName)}.model3.json`;
 
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
