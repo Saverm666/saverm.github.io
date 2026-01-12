@@ -25,11 +25,11 @@
     };
 
     // 1. 加载 Cubism 4 Core SDK (必须!)
-    loadScript('https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js')
+    loadScript('/js/live2dcubismcore.min.js')
       // 2. 加载 PixiJS
-      .then(() => loadScript('https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js'))
+      .then(() => loadScript('/js/pixi.min.js'))
       // 3. 加载 Pixi Live2D Display
-      .then(() => loadScript('https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/index.min.js'))
+      .then(() => loadScript('/js/pixi-live2d-display.min.js'))
       .then(() => {
         console.log('[Live2D] All libraries loaded. Creating canvas...');
         
