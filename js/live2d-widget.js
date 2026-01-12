@@ -34,8 +34,8 @@
       })
       // 2. 加载 PixiJS
       .then(() => loadScript('/js/pixi.min.js'))
-      // 3. 加载 Pixi Live2D Display
-      .then(() => loadScript('/js/pixi-live2d-display.min.js'))
+      // 3. 加载 Pixi Live2D Display (Cubism 4 专用版)
+      .then(() => loadScript('/js/pixi-live2d-display-c4.min.js'))
       .then(() => {
         console.log('[Live2D] All libraries loaded. Checking environment...');
         
