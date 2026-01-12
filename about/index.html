@@ -546,10 +546,13 @@
     <div class="my-card">
       <div class="custom-title">近期正在...</div>
       <ul class="simple-list">
-        <li>跑实验</li>
-        <li>考试</li>
-        <li>八点起</li>
-        <li>跑3.5千米刷锻</li>
+        <% if (page.recent_doings && page.recent_doings.length > 0) { %>
+          <% page.recent_doings.forEach(function(item) { %>
+            <li><%= item %></li>
+          <% }); %>
+        <% } else { %>
+          <li>暂无动态</li>
+        <% } %>
       </ul>
     </div>
 
