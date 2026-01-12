@@ -3,11 +3,8 @@
   if (window.innerWidth >= 768) {
     console.log('[Live2D] Initializing...');
 
-    // 模型路径回退为 CDN 加载，JS 库保持本地化
-    const repo = 'Saverm666/Live2d4Blog';
-    const branch = 'master';
-    const modelName = '美树沙耶香(バレンタイン18)';
-    const modelPath = `https://cdn.jsdelivr.net/gh/${repo}@${branch}/${encodeURIComponent(modelName)}/${encodeURIComponent(modelName)}.model3.json`;
+    // 改用本地英文路径加载模型，规避中文路径在部署时的 404 问题
+    const modelPath = '/live2d_models/sayaka/model.model3.json';
 
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
