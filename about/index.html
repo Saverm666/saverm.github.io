@@ -631,7 +631,7 @@
      * 触发“魔女化”模式的主控函数
      * 协调 UI 变更、音频播放和动画序列
      */
-    function triggerEvilMode() {
+    async function triggerEvilMode() {
       // 1. 变更文本样式
       applyWitchStyle(elements.triggerBtn, CONFIG.NEW_BIO_TEXT);
       applyWitchStyle(elements.nameLabel, CONFIG.NEW_NAME_TEXT);
@@ -640,8 +640,8 @@
       // 2. 变更头像
       swapAvatar(elements.avatarImg, CONFIG.NEW_AVATAR_PATH);
       
-      // 3. 播放音频
-      playAudioGroup();
+      // 3. 播放音频（等待音频就绪或播放开始）
+      await playAudioGroup();
 
       // 4. 启动打字机动画序列
       typeWriterEffect(CONFIG.TYPEWRITER_TEXT, elements.textContainer, () => {
@@ -680,21 +680,50 @@
 
     /**
      * 初始化并播放音频组 (BGM + 语音)
+     * 返回 Promise 以便同步动画
      */
     function playAudioGroup() {
-      try {
-        if (!bgmInstance) {
-          bgmInstance = new Audio(CONFIG.BGM_PATH);
-          bgmInstance.volume = CONFIG.BGM_VOLUME;
-          bgmInstance.loop = false; 
-          bgmInstance.play().catch(console.warn); // 捕获自动播放策略限制的错误
+      return new Promise((resolve) => {
+        try {
+          // BGM 处理 (不阻塞主流程)
+          if (!bgmInstance) {
+            bgmInstance = new Audio(CONFIG.BGM_PATH);
+            bgmInstance.volume = CONFIG.BGM_VOLUME;
+            bgmInstance.loop = false; 
+            bgmInstance.play().catch(console.warn);
+          }
+          
+          // 语音处理 (核心同步对象)
+          if (!voiceInstance) {
+            voiceInstance = new Audio(CONFIG.VOICE_PATH);
+            voiceInstance.volume = CONFIG.VOICE_VOLUME;
+            
+            // 尝试播放
+            const playPromise = voiceInstance.play();
+            
+            if (playPromise !== undefined) {
+              playPromise.then(() => {
+                // 播放成功开始，立即 resolve
+                resolve();
+              }).catch(error => {
+                console.warn('Voice playback failed:', error);
+                // 即使播放失败也 resolve，避免动画卡死
+                resolve();
+              });
+            } else {
+              // 不支持 Promise 的旧浏览器
+              resolve();
+            }
+          } else {
+            // 已有实例，重新播放
+             voiceInstance.currentTime = 0;
+             voiceInstance.play().then(resolve).catch(resolve);
+          }
+        } catch (e) { 
+          console.error('Audio error:', e); 
+          resolve(); // 发生异常时继续
         }
-        if (!voiceInstance) {
-          voiceInstance = new Audio(CONFIG.VOICE_PATH);
-          voiceInstance.volume = CONFIG.VOICE_VOLUME;
-          voiceInstance.play().catch(console.warn);
-        }
-      } catch (e) { console.error('Audio error:', e); }
+      });
     }
 
     /**
