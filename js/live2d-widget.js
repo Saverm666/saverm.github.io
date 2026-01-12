@@ -25,7 +25,7 @@
     };
 
     // 1. 加载 Cubism 4 Core SDK (必须!)
-    loadScript('/js/live2dcubismcore.min.js')
+    loadScript('/js/live2dcubismcore.min.js?v=1.0.1')
       .then(() => {
           // 核心修正：确保 Cubism 4 Core 挂载到全局，供插件识别
           if (window.Live2DCubismCore) {
@@ -33,9 +33,9 @@
           }
       })
       // 2. 加载 PixiJS
-      .then(() => loadScript('/js/pixi.min.js'))
+      .then(() => loadScript('/js/pixi.min.js?v=6.5.2'))
       // 3. 加载 Pixi Live2D Display (Cubism 4 专用版)
-      .then(() => loadScript('/js/pixi-live2d-display-c4.min.js'))
+      .then(() => loadScript('/js/pixi-live2d-display-c4.min.js?v=0.4.0'))
       .then(() => {
         console.log('[Live2D] All libraries loaded. Checking environment...');
         
