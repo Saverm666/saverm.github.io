@@ -1,50 +1,51 @@
-// 动态加载 Live2D 看板娘脚本
+// 动态加载 Live2D 看板娘脚本 (Cubism 4 支持版)
 (function() {
   if (window.innerWidth >= 768) {
-    // 1. 定义 CDN 基础路径 (jsDelivr)
+    console.log('[Live2D] Initializing...');
+
     const repo = 'Saverm666/Live2d4Blog';
     const branch = 'master';
     const modelName = '美树沙耶香(バレンタイン18)';
-    // 注意：URL 必须进行 URI 编码，特别是包含中文和括号的部分
     const modelPath = `https://cdn.jsdelivr.net/gh/${repo}@${branch}/${encodeURIComponent(modelName)}/${encodeURIComponent(modelName)}.model3.json`;
-
-    // 2. 配置 Live2D
-    // 由于 stevenjoezhang/live2d-widget 主要支持 Cubism 2，
-    // 对于 Cubism 3/4 (.model3.json)，我们需要使用支持该格式的加载器。
-    // 这里我们使用一个支持 Cubism 4 的轻量级加载方案 (基于 PIO 或其他兼容实现)
-    
-    // 为了简化集成，我们直接注入一个支持 Cubism 4 的 Live2D 挂件
-    // 这里使用 guansss/pixi-live2d-display 的简易封装或类似的现代加载器
-    // 鉴于现有的 live2d-widget 插件对 Cubism 3 支持有限，我们改用一种通用的加载方式：
-    // 引入 Cubism 4 SDK 和 PixiJS (目前最流行的 Live2D Web 渲染方案)
 
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = src;
-        script.onload = resolve;
-        script.onerror = reject;
+        script.onload = () => {
+            console.log(`[Live2D] Loaded: ${src}`);
+            resolve();
+        };
+        script.onerror = (e) => {
+            console.error(`[Live2D] Failed to load: ${src}`, e);
+            reject(e);
+        };
         document.head.appendChild(script);
       });
     };
 
-    // 串行加载依赖库
-    loadScript('https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js')
+    // 1. 加载 Cubism 4 Core SDK (必须!)
+    loadScript('https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js')
+      // 2. 加载 PixiJS
+      .then(() => loadScript('https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js'))
+      // 3. 加载 Pixi Live2D Display
       .then(() => loadScript('https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/index.min.js'))
       .then(() => {
-        // 创建画布容器
+        console.log('[Live2D] All libraries loaded. Creating canvas...');
+        
         const canvas = document.createElement('canvas');
         canvas.id = 'live2d-canvas';
-        canvas.style.position = 'fixed';
-        canvas.style.left = '0px'; // 调整位置
-        canvas.style.bottom = '0px';
-        canvas.style.width = '300px'; // 可调整大小
-        canvas.style.height = '350px';
-        canvas.style.zIndex = '999';
-        canvas.style.pointerEvents = 'none'; // 让鼠标事件穿透画布（如果需要交互则设为 auto）
+        Object.assign(canvas.style, {
+            position: 'fixed',
+            left: '0',
+            bottom: '0',
+            width: '300px',
+            height: '400px',
+            zIndex: '99999', // 提高层级
+            pointerEvents: 'none' 
+        });
         document.body.appendChild(canvas);
 
-        // 初始化 Pixi 应用
         const app = new PIXI.Application({
           view: canvas,
           autoStart: true,
@@ -53,28 +54,37 @@
           backgroundAlpha: 0
         });
 
-        // 加载模型
+        console.log(`[Live2D] Loading model from: ${modelPath}`);
+
         PIXI.live2d.Live2DModel.from(modelPath).then((model) => {
+          console.log('[Live2D] Model loaded successfully!');
           app.stage.addChild(model);
           
-          // 调整模型缩放和位置
-          // 需要根据模型的实际大小进行微调
+          // 适配缩放
           const scaleX = canvas.width / model.width;
           const scaleY = canvas.height / model.height;
-          // 取较小的缩放比例以适应容器
-          const scale = Math.min(scaleX, scaleY) * 2; // 放大一点
+          const scale = Math.min(scaleX, scaleY);
           
           model.scale.set(scale);
-          model.x = (canvas.width - model.width * scale) / 2; // 水平居中
-          model.y = canvas.height - model.height * scale + 50; // 底部对齐，微调偏移
+          model.x = (canvas.width - model.width * scale) / 2;
+          model.y = canvas.height - model.height * scale; // 底部对齐
           
-          // 启用交互 (可选)
+          // 启用交互
           model.interactive = true;
+          // 这里的 buttonMode 在 Pixi v7+ 已弃用，但 v6 可用
+          model.buttonMode = true; 
+          
           model.on('pointertap', () => {
-             model.motion('TapBody'); // 播放点击动作，具体动作名需参考 model3.json
+             console.log('[Live2D] Touched!');
+             // 随机播放一个动作
+             model.motion('TapBody'); 
           });
+        }).catch(err => {
+            console.error('[Live2D] Model load error:', err);
         });
       })
-      .catch(err => console.error('Live2D load failed:', err));
+      .catch(err => console.error('[Live2D] Dependency load failed:', err));
+  } else {
+      console.log('[Live2D] Skipped on mobile device.');
   }
 })();
