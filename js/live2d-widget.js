@@ -54,10 +54,10 @@
         Object.assign(canvas.style, {
             position: 'fixed',
             left: '0',
-            bottom: '0',
-            width: '300px',
-            height: '400px',
-            zIndex: '99999', // 提高层级
+            bottom: '30px', // 整体上移 30px
+            width: '280px', // 稍微调窄一点，避免太占地
+            height: '350px', // 调整高度
+            zIndex: '99999', 
             pointerEvents: 'none' 
         });
         document.body.appendChild(canvas);
