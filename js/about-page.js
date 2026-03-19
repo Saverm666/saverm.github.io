@@ -150,12 +150,16 @@
       linksContainer.innerHTML = ""
       profile.profileLinks.forEach((link) => {
         const href = link && link.url ? link.url : "#"
+        const hoverText = href.startsWith("mailto:") ? href.replace(/^mailto:/, "") : href
         const anchor = document.createElement("a")
         const label = document.createElement("span")
         const icon = document.createElement("i")
 
         anchor.className = "about-btn"
         anchor.href = href
+        anchor.dataset.hoverDetail = hoverText
+        anchor.title = hoverText
+        anchor.setAttribute("aria-label", hoverText)
         if (/^https?:\/\//.test(href)) {
           anchor.target = "_blank"
           anchor.rel = "noopener noreferrer"

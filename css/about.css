@@ -102,6 +102,7 @@
 }
 
 .page-container .page-content .about-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -116,6 +117,31 @@
   color: #666c80;
   background: transparent;
   transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.page-container .page-content .about-btn::after {
+  content: attr(data-hover-detail);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  display: none;
+  max-width: min(80vw, 420px);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(34, 39, 46, 0.94);
+  color: #fff;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.page-container .page-content .about-btn:hover::after,
+.page-container .page-content .about-btn:focus-visible::after {
+  display: block;
 }
 
 .page-container .page-content .about-btn:hover {

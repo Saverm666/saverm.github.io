@@ -41,7 +41,7 @@
     <script class="keep-theme-configurations">
     const KEEP = window.KEEP || {}
     KEEP.hexo_config = {"hostname":"example.com","root":"/","language":"zh-CN","path":"search.xml"}
-    KEEP.theme_config = {"base_info":{"primary_color":"#0066cc","title":"Saverm's Blog","author":"Saverm","avatar":"/images/avatar.jpg","logo":"/images/logo.jpg","favicon":"/images/favicon.jpg","show_on_mobile":true},"menu":{"home":"/","archives":"/archives","tags":"/tags","about":"/about"},"first_screen":{"enable":true,"background_img":"/images/bg.jpg","background_img_dark":"/images/bg.jpg","description":"","hitokoto":false},"social_contact":{"enable":true,"links":{"github":"https://github.com/Saverm666","weixin":null,"qq":null,"weibo":null,"zhihu":null,"twitter":null,"x":null,"facebook":null,"email":"Saverm666@gmail.com","bilibili":"https://space.bilibili.com/95422921"}},"scroll":{"progress_bar":false,"percent":false,"hide_header":true},"home":{"announcement":null,"category":false,"tag":false,"post_datetime":"updated"},"post":{"author_badge":{"enable":true,"level_badge":true,"custom_badge":["One","Two","Three"]},"word_count":{"wordcount":false,"min2read":false},"datetime_format":"YYYY-MM-DD HH:mm:ss","copyright_info":false,"share":false,"reward":{"enable":false,"img_link":null,"text":null,"icon":null}},"code_block":{"tools":{"enable":true,"style":"default"},"highlight_theme":"obsidian"},"toc":{"enable":true,"number":true,"expand_all":true,"init_open":true,"layout":"left"},"website_count":{"busuanzi_count":{"enable":true,"site_uv":true,"site_pv":true,"page_pv":true}},"local_search":{"enable":true,"preload":false},"comment":{"enable":false,"use":"valine","valine":{"appid":null,"appkey":null,"server_urls":null,"placeholder":null},"gitalk":{"github_id":null,"github_admins":null,"repository":null,"client_id":null,"client_secret":null,"proxy":null},"twikoo":{"env_id":null,"region":null,"version":"1.6.39"},"waline":{"server_url":null,"reaction":false,"version":"3.3.2"},"giscus":{"repo":null,"repo_id":null,"category":"Announcements","category_id":null,"reactions_enabled":false},"artalk":{"server":null},"disqus":{"shortname":null}},"rss":{"enable":false},"lazyload":{"enable":false},"cdn":{"enable":true,"provider":"jsdelivr"},"pjax":{"enable":false},"footer":{"since":2025,"word_count":true,"site_deploy":{"enable":false,"provider":"github","url":null},"record":{"enable":false,"list":[{"code":null,"link":null}]}},"inject":{"enable":true,"css":[null,"/css/custom.css","/css/about.css"],"js":[null,"/js/site-ui-config.js","/js/live2d-widget-v2.js","/js/home-random-quote.js","/js/about-page.js"]},"root":"","source_data":{},"version":"4.2.5"}
+    KEEP.theme_config = {"base_info":{"primary_color":"#0066cc","title":"Saverm's Blog","author":"Saverm","avatar":"/images/avatar.jpg","logo":"/images/logo.jpg","favicon":"/images/favicon.jpg","show_on_mobile":true},"menu":{"home":"/","archives":"/archives","tags":"/tags","about":"/about"},"first_screen":{"enable":true,"background_img":"/images/bg.jpg","background_img_dark":"/images/bg.jpg","description":"","hitokoto":false},"social_contact":{"enable":true,"links":{"github":"https://github.com/Saverm666","weixin":null,"qq":null,"weibo":null,"zhihu":null,"twitter":null,"x":null,"facebook":null,"email":"Saverm666@gmail.com","bilibili":"https://space.bilibili.com/95422921"}},"scroll":{"progress_bar":false,"percent":false,"hide_header":true},"home":{"announcement":null,"category":false,"tag":false,"post_datetime":"updated"},"post":{"author_badge":{"enable":true,"level_badge":true,"custom_badge":["One","Two","Three"]},"word_count":{"wordcount":false,"min2read":false},"datetime_format":"YYYY-MM-DD HH:mm:ss","copyright_info":false,"share":false,"reward":{"enable":false,"img_link":null,"text":null,"icon":null}},"code_block":{"tools":{"enable":true,"style":"default"},"highlight_theme":"obsidian"},"toc":{"enable":true,"number":true,"expand_all":true,"init_open":true,"layout":"left"},"website_count":{"busuanzi_count":{"enable":true,"site_uv":true,"site_pv":true,"page_pv":true}},"local_search":{"enable":true,"preload":false},"comment":{"enable":false,"use":"valine","valine":{"appid":null,"appkey":null,"server_urls":null,"placeholder":null},"gitalk":{"github_id":null,"github_admins":null,"repository":null,"client_id":null,"client_secret":null,"proxy":null},"twikoo":{"env_id":null,"region":null,"version":"1.6.39"},"waline":{"server_url":null,"reaction":false,"version":"3.3.2"},"giscus":{"repo":null,"repo_id":null,"category":"Announcements","category_id":null,"reactions_enabled":false},"artalk":{"server":null},"disqus":{"shortname":null}},"rss":{"enable":false},"lazyload":{"enable":false},"cdn":{"enable":true,"provider":"jsdelivr"},"pjax":{"enable":false},"footer":{"since":2025,"word_count":true,"site_deploy":{"enable":false,"provider":"github","url":null},"record":{"enable":false,"list":[{"code":null,"link":null}]}},"inject":{"enable":true,"css":[null,"/css/custom.css","/css/about.css"],"js":[null,"/js/site-ui-config.js","/js/live2d-widget-v2.js","/js/home-social-tooltip.js","/js/home-random-quote.js","/js/about-page.js"]},"root":"","source_data":{},"version":"4.2.5"}
     KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"}
     KEEP.language_code_block = {"copy":"复制代码","copied":"已复制","fold":"折叠代码块","folded":"已折叠"}
     KEEP.language_copy_copyright = {"copy":"复制版权信息","copied":"已复制","title":"原文标题","author":"原文作者","link":"原文链接"}
@@ -308,68 +308,185 @@
             <div class="main-content border-box">
                 
 
-                    <div class="home-content-container fade-in-down-animation">
-    
-    <ul class="home-post-list border-box">
-        
-            <li class="home-post-item">
+                    .home-content-container {
+  background var(--background-color-1)
 
-                
+  if (hexo-config('home') && hexo-config('home.announcement')) {
+    .website-announcement {
+      keep-container(var(--home-post-hover-scale), 1rem, 1.8rem)
+      display flex
+      align-items center
+      justify-content space-between
+      margin-top -0.6rem
 
-                <div class="home-post-item-bottom border-box">
-                    
-                    <h3 class="home-post-title border-box">
-                        <a href="/2025/12/02/%E5%92%95%E5%92%95%E5%92%95/">
-                            咕咕咕
-                        </a>
-                    </h3>
-
-                    <div class="home-post-content keep-markdown-body">
-                        
-                            随便占个坑，暂时不想写呢还。。。
-寒假更新吧。
-
-                        
-                    </div>
-
-                    
-
-<div class="post-meta-info-container border-box home">
-    <div class="post-meta-info border-box">
-        
-            <span class="meta-info-item border-box">
-                <i class="icon fa-solid fa-history"></i>&nbsp;<span class="home-post-history"
-                                                                                data-updated="Tue Dec 02 2025 14:41:49 GMT+0800"
-                >2025-12-02 14:41:49</span>
-            </span>
-        
-
-        
-
-        
-
-        
-
-        
-        
-        
-        
-    </div>
-
-    
-        <a class="home-read-more" href="/2025/12/02/%E5%92%95%E5%92%95%E5%92%95/">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
-    
-</div>
-
-                </div>
-            </li>
-        
-    </ul>
-    
+      +keep-tablet() {
+        margin-top -0.4rem
+      }
 
 
+      +keep-mobile() {
+        margin-top -0.2rem
 
-</div>
+        .announcement {
+          font-size 0.9rem
+        }
+
+        .icon {
+          font-size 1rem !important
+        }
+      }
+
+
+      .announcement {
+        width 100%
+        padding 0 0.5rem
+        color var(--text-color-3)
+
+        p {
+          width 100%
+          overflow hidden
+          white-space nowrap
+          text-overflow ellipsis
+        }
+      }
+
+
+      .icon {
+        flex-shrink 0
+        padding 0.2rem
+        font-size 1.2rem
+
+        &.left {
+          color var(--keep-danger-color)
+          font-size 1.5rem
+          transform-origin left bottom
+          animation shake 1s ease infinite
+        }
+
+        &.right {
+          color var(--text-color-4)
+          cursor pointer
+
+          &:hover {
+            color var(--text-color-3)
+          }
+        }
+      }
+    }
+  }
+
+  .home-post-list {
+
+    .home-post-item {
+      position relative
+
+      keep-container(var(--home-post-hover-scale), 0, 2.8rem)
+
+      .post-sticky-box {
+        position absolute
+        z-index $z-index-1
+        display flex
+        align-items center
+        box-sizing border-box
+        padding 0.1rem 0.4rem
+        color var(--text-color-4)
+        font-size 12px
+        letter-spacing 1px
+        background var(--background-color-3)
+        border-radius 0.3rem
+        transform scale(0.86)
+        cursor default
+        disable-user-select()
+
+        &.cover-offset {
+          top 0.6rem
+          right 0.6rem
+        }
+
+        &.card-offset {
+          top 0.8rem
+          right 0.8rem
+        }
+
+        +keep-mobile() {
+          padding 0
+          background none
+          transform rotate(45deg)
+
+          .sticky-name {
+            display none
+          }
+        }
+      }
+
+
+      .home-post-item-top {
+        width 100%
+        overflow hidden
+        background-color var(--background-color-2)
+        border-top-left-radius var(--box-border-radius)
+        border-top-right-radius var(--box-border-radius)
+
+        +keep-mobile() {
+          height 8rem !important
+        }
+
+        .home-cover {
+          width 100%
+          height 100%
+          object-fit cover
+          transform-origin center center
+          transition-t("transform", "0", "1", "linear")
+
+          &:hover {
+            transform scale(1.03)
+          }
+        }
+      }
+
+
+      .home-post-item-bottom {
+        padding 2rem
+
+        .sticky-icon {
+          position absolute
+          top 1.2rem
+          right 1.2rem
+          color var(--text-color-4)
+          font-size 1.2rem
+          transform rotate(45deg)
+        }
+
+
+        .home-post-title {
+          margin 0
+          color var(--text-color-2)
+          font-weight 600
+          font-size 1.4rem
+          line-height 1.5
+
+
+          +keep-tablet() {
+            font-size 1.3rem
+          }
+
+
+          +keep-mobile() {
+            font-size 1.2rem
+          }
+        }
+
+
+        .home-post-content {
+          margin 1.8rem 0
+          color var(--text-color-3)
+          text-align justify
+          word-wrap break-word
+        }
+      }
+    }
+  }
+}
 
 
                 
@@ -566,6 +683,12 @@
         
             
 <script class="custom-inject-js" src="/js/live2d-widget-v2.js" data-pjax></script>
+
+        
+    
+        
+            
+<script class="custom-inject-js" src="/js/home-social-tooltip.js" data-pjax></script>
 
         
     
