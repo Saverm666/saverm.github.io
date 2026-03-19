@@ -1,183 +1,325 @@
-/* ==========================================================================
-   About Page Custom Styles
-   Theme Color: #0066cc (Matches config)
-   Style: Minimalist Card Design
-   ========================================================================== */
+@font-face {
+  font-family: "WitchRunes";
+  src: url("/fonts/MadokaRunes.ttf") format("truetype");
+}
 
 :root {
-    --primary-color: #0066cc;
-    --primary-light: #e6f0ff;
-    --text-main: #333333;
-    --text-secondary: #666666;
-    --card-bg: #ffffff;
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    --hover-shadow: 0 8px 30px rgba(0, 102, 204, 0.15);
-    --radius: 12px;
+  --about-primary-color: #38649f;
+  --about-text-main: #333;
+  --about-text-sub: #666;
+  --about-sayaka-blue: #24b7dc;
 }
 
-/* Container Layout */
-.about-wrapper {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+.page-container .page-content .about-page {
+  max-width: 960px;
+  margin: 30px auto;
 }
 
-/* Common Card Style */
-.profile-card, .content-card {
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    padding: 30px;
-    margin-bottom: 25px;
-    box-shadow: var(--card-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.02);
+.about-page__prefetch {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  z-index: -999;
 }
 
-.profile-card:hover, .content-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--hover-shadow);
+.page-container .page-content .about-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  line-height: 1.6;
+  position: relative;
 }
 
-/* Profile Section Specifics */
-.profile-card {
-    text-align: center;
+.page-container .page-content .about-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.02);
 }
 
-.avatar-box img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid var(--primary-light);
-    object-fit: cover;
-    margin-bottom: 15px;
-    transition: transform 0.5s ease;
+.page-container .page-content .about-left {
+  flex: 0 0 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: sticky;
+  top: 20px;
+  z-index: 10;
 }
 
-.avatar-box img:hover {
-    transform: rotate(360deg);
+.page-container .page-content .about-avatar-wrap {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  padding: 4px;
+  background: #fff;
+  border: 1px solid #eee;
+  margin-bottom: 12px;
+  overflow: hidden;
 }
 
-.name {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--text-main);
-    margin: 10px 0 5px;
+.page-container .page-content .about-avatar-wrap img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s;
 }
 
-.bio {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
+.page-container .page-content .about-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--about-text-main);
+  margin: 5px 0 8px;
 }
 
-/* Social Buttons */
-.social-links {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
+.page-container .page-content .about-bio {
+  font-size: 0.9rem;
+  color: var(--about-text-sub);
+  margin-bottom: 20px;
 }
 
-.social-btn {
-    padding: 8px 24px;
-    border-radius: 20px;
-    text-decoration: none !important;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
+.page-container .page-content .about-bio-trigger {
+  cursor: text;
+  user-select: none;
 }
 
-.social-btn.github {
-    background-color: #24292e;
-    color: white;
+.page-container .page-content .about-bio-trigger.is-loading {
+  cursor: progress;
+  opacity: 0.7;
 }
 
-.social-btn.email {
-    background-color: var(--primary-color);
-    color: white;
+.page-container .page-content .about-btn-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.social-btn:hover {
-    opacity: 0.9;
-    transform: scale(1.05);
+.page-container .page-content .about-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 0 6px;
+  border-radius: 0;
+  border-bottom: 2px solid rgba(114, 119, 139, 0.55);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none !important;
+  color: #666c80;
+  background: transparent;
+  transition: color 0.18s ease, border-color 0.18s ease;
 }
 
-/* Content Sections */
-.section-title {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    border-left: 4px solid var(--primary-color);
-    padding-left: 12px;
-    color: var(--text-main);
+.page-container .page-content .about-btn:hover {
+  color: #444a5d;
+  border-color: rgba(68, 74, 93, 0.75);
 }
 
-.content-card p {
-    line-height: 1.8;
-    color: var(--text-secondary);
-    font-size: 1rem;
+.page-container .page-content .about-btn-icon {
+  font-size: 0.72em;
+  line-height: 1;
+  transform: translateY(-2px);
 }
 
-/* Skill Tags */
-.skill-box {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+.page-container .page-content .about-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: left !important;
 }
 
-.skill-tag {
-    background-color: var(--primary-light);
-    color: var(--primary-color);
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
+.page-container .page-content .about-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--about-text-main);
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
 }
 
-.skill-tag:hover {
-    background-color: var(--primary-color);
-    color: white;
-    cursor: default;
+.page-container .page-content .about-section-title::before {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 18px;
+  background: var(--about-primary-color);
+  margin-right: 12px;
+  border-radius: 2px;
 }
 
-/* Goal List */
-.goal-list {
-    list-style: none;
+.page-container .page-content .about-desc {
+  color: var(--about-text-sub);
+  margin: 0;
+  line-height: 1.8;
+}
+
+.page-container .page-content .about-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page-container .page-content .about-tag {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: #f4f5f7;
+  color: #555;
+}
+
+.page-container .page-content .about-tag:nth-child(3n + 1) {
+  background: #e8f4fd;
+  color: #3498db;
+}
+
+.page-container .page-content .about-tag:nth-child(3n + 2) {
+  background: #fdf0e8;
+  color: #e67e22;
+}
+
+.page-container .page-content .about-tag:nth-child(3n) {
+  background: #edf8ec;
+  color: #2f855a;
+}
+
+.page-container .page-content .about-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--about-text-sub);
+}
+
+.page-container .page-content .about-list li {
+  margin-bottom: 8px;
+}
+
+.page-container .page-content .witch-mode-text {
+  font-family: "WitchRunes", sans-serif !important;
+  font-size: 1.4em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: normal !important;
+  line-height: 1.4;
+}
+
+.page-container .page-content .about-evil-mode .about-name.witch-mode-text,
+.page-container .page-content .about-evil-mode .about-bio.witch-mode-text {
+  color: var(--about-primary-color) !important;
+  text-shadow: 0 0 12px rgba(231, 76, 60, 0.18);
+}
+
+.page-container .page-content .about-evil-mode .about-avatar-wrap {
+  border-color: rgba(231, 76, 60, 0.28);
+  box-shadow: 0 0 0 5px rgba(231, 76, 60, 0.08);
+}
+
+#typewriter-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2147483647;
+  pointer-events: none;
+  background: transparent;
+}
+
+#typewriter-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--about-sayaka-blue);
+  font-family: "Songti SC", "SimSun", "Times New Roman", serif;
+  text-shadow: 0 0 15px rgba(146, 223, 243, 0.6);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.char-shard {
+  display: inline-block;
+  transition:
+    transform 1.5s cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 1.5s ease-out,
+    filter 1.5s ease-out;
+  transform-origin: center center;
+  backface-visibility: hidden;
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background-color: var(--about-sayaka-blue);
+  vertical-align: text-bottom;
+  animation: about-blink 1s step-end infinite;
+  margin-left: 5px;
+}
+
+@keyframes about-blink {
+  from,
+  to {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container .page-content .about-page {
+    margin: 20px auto;
+    padding: 0 12px;
+  }
+
+  .page-container .page-content .about-wrapper {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .page-container .page-content .about-left,
+  .page-container .page-content .about-right {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block;
+    margin: 0 auto 20px;
     padding: 0;
-    margin: 0;
-}
+    position: static;
+  }
 
-.goal-list li {
-    padding: 10px 0;
-    border-bottom: 1px dashed #eee;
-    color: var(--text-secondary);
-}
+  .page-container .page-content .about-card {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+  }
 
-.goal-list li:last-child {
-    border-bottom: none;
-}
+  .page-container .page-content .about-avatar-wrap {
+    margin: 0 auto 12px;
+  }
 
-/* Dark Mode Adaptation (Hexo Keep specific) */
-/* Keep 主题通常会在 html 或 body 标签上添加 'dark-mode' 类 */
-html.dark-mode .profile-card,
-html.dark-mode .content-card {
-    background: #2c2c2c; /* Adjust based on theme dark bg */
-    border-color: #3a3a3a;
-}
+  #typewriter-text {
+    font-size: 1.5rem;
+    width: 100%;
+    text-align: center;
+    white-space: normal;
+  }
 
-html.dark-mode .name,
-html.dark-mode .section-title {
-    color: #e0e0e0;
-}
-
-html.dark-mode .bio,
-html.dark-mode .content-card p,
-html.dark-mode .goal-list li {
-    color: #a0a0a0;
-}
-
-html.dark-mode .skill-tag {
-    background-color: #1f2d3d;
-    color: #5c9eff;
+  .page-container .page-content .witch-mode-text {
+    letter-spacing: 1px;
+    font-size: 1.2em;
+    word-break: break-all;
+    white-space: normal;
+  }
 }

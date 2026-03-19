@@ -55,7 +55,8 @@
   }
 
   function renderRandomQuote() {
-    const quoteConfig = KEEP.theme_config?.home_random_quote || {}
+    const quoteConfig =
+      window.SAVERM_UI_CONFIG?.home_random_quote || KEEP.theme_config?.home_random_quote || {}
     const firstScreenConfig = KEEP.theme_config?.first_screen || {}
 
     if (quoteConfig.enable !== true || firstScreenConfig.enable !== true) {
