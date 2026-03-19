@@ -11,6 +11,26 @@ window.SAVERM_UI_CONFIG = {
       "已经没什么好怕的了。"
     ]
   },
+  "live2d_widget": {
+    "tap_voice_every": 5,
+    "tap_text_pool": {
+      "gentle": [
+        "我在，继续往下看吧。"
+      ],
+      "cheerful": [
+        "等等，点太快了吧！"
+      ],
+      "serious": [
+        "光发呆可解决不了问题。",
+        "奇迹这种东西，本来就该付出代价吧。",
+        "正义这种东西，可不是说着玩的。"
+      ],
+      "annoyed": [
+        "你很烦欸。",
+        "别戳了，我在想事情。"
+      ]
+    }
+  },
   "about": {
     "name": "Saverm",
     "avatar": "/images/avatar.jpg",

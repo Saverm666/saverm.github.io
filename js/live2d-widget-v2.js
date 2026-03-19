@@ -1,5 +1,6 @@
 // Stable Sayaka Live2D widget for desktop pages.
 (function() {
+  // ---- Core constants & default config -----------------------------------
   const MIN_DESKTOP_WIDTH = 768;
   const MODEL_PATH = '/live2d_models/sayaka/model.model3.json';
   const PARAMS_PATH = '/live2d_models/sayaka/params.json';
@@ -20,78 +21,151 @@
   const DEFAULT_PARAMS = {
     modelScale: 1.3
   };
+  const DEFAULT_WIDGET_CONFIG = {
+    tapVoiceEvery: 5,
+    tapTextPool: [],
+    tapTextPoolByEmotion: {
+      cheerful: ['这下注意到我了吧。'],
+      gentle: ['我在，继续往下看吧。'],
+      shy: ['嗯，我在呢。'],
+      caring: ['有事就叫我。']
+    }
+  };
   const DAY_PERIOD_PROFILES = {
     morning: {
       idleMinMs: 18000,
       idleMaxMs: 28000,
+      emotions: {
+        greeting: ['cheerful', 'gentle'],
+        tap: ['cheerful', 'serious'],
+        idle: ['calm', 'gentle']
+      },
       messages: {
-        greeting: [
-          '早安，今天也一起打起精神吧。',
-          '早上好，要开始今天的浏览了吗？'
-        ],
-        tap: [
-          '早晨就这么有活力，不错嘛。',
-          '清醒一点，继续出发。'
-        ],
-        idle: [
-          '我先帮你看着这页内容。',
-          '先喘口气，慢慢看。'
-        ]
+        greeting: {
+          cheerful: ['早安，今天也一起打起精神吧。'],
+          gentle: ['早上好，要开始今天的浏览了吗？']
+        },
+        tap: {
+          cheerful: ['早晨就这么有活力，不错嘛。'],
+          serious: ['清醒一点，继续出发。']
+        },
+        idle: {
+          calm: ['我先帮你看着这页内容。'],
+          gentle: ['先喘口气，慢慢看。']
+        }
       }
     },
     daytime: {
       idleMinMs: 16000,
       idleMaxMs: 24000,
+      emotions: {
+        greeting: ['cheerful', 'gentle'],
+        tap: ['gentle', 'cheerful', 'annoyed'],
+        idle: ['calm', 'caring']
+      },
       messages: {
-        greeting: [
-          '欢迎回来，今天想看点什么？',
-          '白天就该元气满满地逛博客。'
-        ],
-        tap: [
-          '我在，继续往下看吧。',
-          '这下注意到我了吧。'
-        ],
-        idle: [
-          '这会儿适合认真看看新东西。',
-          '我先安静待机，有事再叫我。'
-        ]
+        greeting: {
+          gentle: ['欢迎回来，今天想看点什么？'],
+          cheerful: ['白天就该元气满满地逛博客。']
+        },
+        tap: {
+          gentle: ['我在，继续往下看吧。'],
+          cheerful: ['这下注意到我了吧。']
+        },
+        idle: {
+          calm: ['这会儿适合认真看看新东西。'],
+          caring: ['我先安静待机，有事再叫我。']
+        }
       }
     },
     evening: {
       idleMinMs: 20000,
       idleMaxMs: 30000,
+      emotions: {
+        greeting: ['gentle', 'calm'],
+        tap: ['gentle', 'shy', 'serious'],
+        idle: ['caring', 'calm']
+      },
       messages: {
-        greeting: [
-          '傍晚好，节奏可以慢一点。',
-          '晚上适合放松着随便看看。'
-        ],
-        tap: [
-          '别急，慢慢来。',
-          '嗯，我还在这里。'
-        ],
-        idle: [
-          '天色暗下来了，别太累。',
-          '我先陪你安静一会儿。'
-        ]
+        greeting: {
+          gentle: ['傍晚好，节奏可以慢一点。'],
+          calm: ['晚上适合放松着随便看看。']
+        },
+        tap: {
+          gentle: ['别急，慢慢来。'],
+          shy: ['嗯，我还在这里。']
+        },
+        idle: {
+          caring: ['天色暗下来了，别太累。'],
+          calm: ['我先陪你安静一会儿。']
+        }
       }
     },
     night: {
       idleMinMs: 22000,
       idleMaxMs: 32000,
+      emotions: {
+        greeting: ['caring', 'calm'],
+        tap: ['caring', 'serious', 'annoyed'],
+        idle: ['calm', 'caring']
+      },
       messages: {
-        greeting: [
-          '夜深了，记得早点休息。',
-          '晚上好，安静一点也挺好。'
-        ],
-        tap: [
-          '还没睡呀？那我陪你一会儿。',
-          '夜里也别盯屏幕太久。'
-        ],
-        idle: [
-          '这会儿适合慢慢看，不用着急。',
-          '我先守在这里，你也别太晚。'
-        ]
+        greeting: {
+          caring: ['夜深了，记得早点休息。'],
+          calm: ['晚上好，安静一点也挺好。']
+        },
+        tap: {
+          caring: ['还没睡呀？那我陪你一会儿。'],
+          serious: ['夜里也别盯屏幕太久。']
+        },
+        idle: {
+          calm: ['这会儿适合慢慢看，不用着急。'],
+          caring: ['我先守在这里，你也别太晚。']
+        }
       }
+    }
+  };
+  // Expression indexes come from model.model3.json -> FileReferences.Expressions:
+  // 0: mtn_ex_010  neutral / soft
+  // 1: mtn_ex_011  closed-eye smile
+  // 2: mtn_ex_020  troubled / displeased
+  // 3: mtn_ex_030  determined / stern
+  // 4: mtn_ex_040  gentle smile
+  // 5: mtn_ex_041  bright laugh
+  // 6: mtn_ex_050  startled
+  // 7: mtn_ex_060  wink / playful smile
+  // These labels are inferred from expression parameter files in source/live2d_models/sayaka/exp/.
+  const EXPRESSION_POOLS_BY_EMOTION = {
+    annoyed: [2, 3],
+    calm: [0],
+    caring: [0, 4],
+    cheerful: [1, 5],
+    gentle: [0, 4],
+    serious: [2, 3],
+    shy: [1],
+    surprised: [6],
+    playful: [7]
+  };
+  const LEGACY_EXPRESSION_POOLS = {
+    morning: {
+      greeting: [0, 3, 4],
+      tap: [0, 2, 4, 5],
+      idle: [1, 3, 4]
+    },
+    daytime: {
+      greeting: [0, 2, 4, 5],
+      tap: [0, 2, 4, 5, 6],
+      idle: [1, 2, 5]
+    },
+    evening: {
+      greeting: [1, 2, 5, 6],
+      tap: [1, 2, 5, 6, 7],
+      idle: [1, 5, 6]
+    },
+    night: {
+      greeting: [1, 3, 6, 7],
+      tap: [1, 3, 5, 6, 7],
+      idle: [1, 3, 6]
     }
   };
   let widgetStateCache = null;
@@ -171,6 +245,7 @@
     }
   }
 
+  // ---- Layout & canvas shell ---------------------------------------------
   function getCanvasSize() {
     const viewportHeight = window.innerHeight || 800;
     const maxHeight = Math.max(420, Math.floor(viewportHeight * 0.86));
@@ -262,6 +337,7 @@
     const container = view.container;
     const bubble = view.bubble;
     const animationCatalog = getAnimationCatalog(model);
+    const widgetConfig = getLive2DWidgetConfig();
     const voicePlayer = createVoicePlayer();
     let pointerDown = false;
     let dragged = false;
@@ -269,6 +345,7 @@
     let originLeft = 0;
     let bubbleTimer = 0;
     let idleTimer = 0;
+    let tapCount = 0;
 
     scheduleIdleReaction();
     maybePlayGreeting();
@@ -344,7 +421,15 @@
         model.tap(point.x, point.y);
       }
 
-      triggerReaction('tap', { withVoice: true, textMode: 'neutral' });
+      // Every Nth tap plays voice; the other taps only show a matching text/emotion pair.
+      tapCount += 1;
+
+      if (tapCount % widgetConfig.tapVoiceEvery === 0) {
+        triggerReaction('tap', { withVoice: true, textMode: 'neutral' });
+        return;
+      }
+
+      triggerReaction('tap');
     }
 
     function focusPointer(event) {
@@ -369,14 +454,23 @@
 
     function triggerReaction(type, options) {
       const profile = getDayPeriodProfile();
-      const tune = Object.assign({ withVoice: false, textMode: 'default' }, options || {});
+      const tune = Object.assign({ withVoice: false, textMode: 'default', bubbleText: '' }, options || {});
+      // Pick one emotion first, then drive both text and expression from it.
+      const emotion = tune.emotion || pickReactionEmotion(profile, type);
+      const reactionText = tune.bubbleText || (
+        tune.textMode === 'default'
+          ? pickReactionMessage(type, profile, widgetConfig, emotion)
+          : ''
+      );
       playMotion(pickMotionEntry(animationCatalog, type));
-      playExpression(profile, type);
+      playExpression(profile, type, emotion);
       if (tune.withVoice) {
         playVoice(pickVoiceEntry(animationCatalog));
       }
-      if (tune.textMode === 'default') {
-        showBubble(pickMessage(profile.messages[type]));
+      if (reactionText) {
+        showBubble(reactionText);
+      } else if (tune.textMode === 'default') {
+        showBubble(pickReactionMessage(type, profile, widgetConfig, emotion));
       } else if (tune.textMode === 'neutral') {
         showBubble(pickNeutralVoiceMessage());
       } else if (tune.textMode === 'silent') {
@@ -394,9 +488,10 @@
       }
 
       window.setTimeout(() => {
+        const emotion = pickReactionEmotion(profile, 'greeting');
         playMotion(pickMotionEntry(animationCatalog, 'greeting'));
-        playExpression(profile, 'greeting');
-        showBubble(pickMessage(profile.messages.greeting));
+        playExpression(profile, 'greeting', emotion);
+        showBubble(pickReactionMessage('greeting', profile, widgetConfig, emotion));
         saveWidgetState({
           lastGreetingAt: Date.now(),
           lastGreetingPeriod: profile.key
@@ -413,9 +508,10 @@
       }, idleDelay);
     }
 
-    function playExpression(profile, type) {
+    function playExpression(profile, type, emotion) {
       if (typeof model.expression !== 'function' || animationCatalog.expressionCount <= 0) return;
-      const expressionIndex = pickExpressionIndex(animationCatalog.expressionCount, profile.key, type);
+      // Expressions are chosen through our inferred emotion -> expression index mapping.
+      const expressionIndex = pickExpressionIndex(animationCatalog.expressionCount, emotion, profile.key, type);
       if (expressionIndex === null) return;
 
       model.expression(expressionIndex).catch((error) => {
@@ -488,6 +584,7 @@
     }
   }
 
+  // ---- Model assets -------------------------------------------------------
   function getAnimationCatalog(model) {
     const settings = model && model.internalModel && model.internalModel.settings;
     const motions = settings && (
@@ -618,6 +715,7 @@
     return lastSlashIndex >= 0 ? MODEL_PATH.slice(0, lastSlashIndex + 1) : '/';
   }
 
+  // ---- Persisted widget state --------------------------------------------
   function loadWidgetState() {
     if (widgetStateCache) return widgetStateCache;
 
@@ -642,12 +740,35 @@
     }
   }
 
+  // ---- Runtime config & reaction selection -------------------------------
   function getDayPeriodProfile() {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 11) return Object.assign({ key: 'morning' }, DAY_PERIOD_PROFILES.morning);
     if (hour >= 11 && hour < 17) return Object.assign({ key: 'daytime' }, DAY_PERIOD_PROFILES.daytime);
     if (hour >= 17 && hour < 22) return Object.assign({ key: 'evening' }, DAY_PERIOD_PROFILES.evening);
     return Object.assign({ key: 'night' }, DAY_PERIOD_PROFILES.night);
+  }
+
+  function getLive2DWidgetConfig() {
+    const rawConfig = (
+      window.SAVERM_UI_CONFIG?.live2d_widget ||
+      window.KEEP?.theme_config?.live2d_widget ||
+      {}
+    );
+    const tapVoiceEvery = Math.max(
+      1,
+      Math.floor(Number(rawConfig.tap_voice_every) || DEFAULT_WIDGET_CONFIG.tapVoiceEvery)
+    );
+    const tapTextPool = normalizeMessagePool(Array.isArray(rawConfig.tap_text_pool) ? rawConfig.tap_text_pool : []);
+    const tapTextPoolByEmotion = normalizeMessagePoolMap(rawConfig.tap_text_pool);
+
+    return {
+      tapVoiceEvery,
+      tapTextPool: tapTextPool.length ? tapTextPool : DEFAULT_WIDGET_CONFIG.tapTextPool.slice(),
+      tapTextPoolByEmotion: hasMessagePoolMap(tapTextPoolByEmotion)
+        ? tapTextPoolByEmotion
+        : cloneMessagePoolMap(DEFAULT_WIDGET_CONFIG.tapTextPoolByEmotion)
+    };
   }
 
   function pickMotionEntry(animationCatalog, type) {
@@ -666,36 +787,19 @@
     return voiceEntries[Math.floor(Math.random() * voiceEntries.length)] || null;
   }
 
-  function pickExpressionIndex(expressionCount, periodKey, type) {
+  function pickExpressionIndex(expressionCount, emotion, periodKey, type) {
     if (!expressionCount) return null;
-
-    const pools = {
-      morning: {
-        greeting: [0, 3, 4],
-        tap: [0, 2, 4, 5],
-        idle: [1, 3, 4]
-      },
-      daytime: {
-        greeting: [0, 2, 4, 5],
-        tap: [0, 2, 4, 5, 6],
-        idle: [1, 2, 5]
-      },
-      evening: {
-        greeting: [1, 2, 5, 6],
-        tap: [1, 2, 5, 6, 7],
-        idle: [1, 5, 6]
-      },
-      night: {
-        greeting: [1, 3, 6, 7],
-        tap: [1, 3, 5, 6, 7],
-        idle: [1, 3, 6]
-      }
-    };
     const fallbackPool = [];
     for (let index = 0; index < expressionCount; index += 1) {
       fallbackPool.push(index);
     }
-    const scopedPool = (((pools[periodKey] || {})[type]) || fallbackPool)
+    // Prefer the explicit emotion mapping; fall back to the old time-of-day pool
+    // so the widget still works even if a new emotion label has no mapping yet.
+    const emotionPool = (EXPRESSION_POOLS_BY_EMOTION[emotion] || [])
+      .filter((index) => index >= 0 && index < expressionCount);
+    const scopedPool = (emotionPool.length
+      ? emotionPool
+      : (((LEGACY_EXPRESSION_POOLS[periodKey] || {})[type]) || fallbackPool))
       .filter((index) => index >= 0 && index < expressionCount);
     const source = scopedPool.length ? scopedPool : fallbackPool;
     return source[Math.floor(Math.random() * source.length)] || 0;
@@ -704,6 +808,34 @@
   function pickMessage(messages) {
     if (!Array.isArray(messages) || !messages.length) return '';
     return messages[Math.floor(Math.random() * messages.length)];
+  }
+
+  function pickReactionEmotion(profile, type) {
+    const source = profile && profile.emotions ? profile.emotions[type] : [];
+    return pickRandomItem(Array.isArray(source) && source.length ? source : ['gentle']) || 'gentle';
+  }
+
+  function pickReactionMessage(type, profile, widgetConfig, emotion) {
+    if (type === 'tap') {
+      const configuredByEmotion = widgetConfig && widgetConfig.tapTextPoolByEmotion
+        ? widgetConfig.tapTextPoolByEmotion
+        : {};
+      const configuredDirect = widgetConfig && Array.isArray(widgetConfig.tapTextPool)
+        ? widgetConfig.tapTextPool
+        : [];
+      // Tap text can be configured by emotion in ui.yml; that config overrides
+      // the built-in period-based defaults.
+      const directConfiguredPool = normalizeMessagePool(configuredByEmotion[emotion]);
+      if (directConfiguredPool.length) return pickMessage(directConfiguredPool);
+      if (configuredDirect.length) return pickMessage(configuredDirect);
+    }
+
+    const messageSource = profile && profile.messages ? profile.messages[type] : [];
+    if (Array.isArray(messageSource)) {
+      return pickMessage(messageSource);
+    }
+
+    return pickMessageFromMap(messageSource, emotion);
   }
 
   function pickNeutralVoiceMessage() {
@@ -718,5 +850,66 @@
 
   function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // ---- Config normalization helpers --------------------------------------
+  function normalizeMessagePool(pool) {
+    if (!Array.isArray(pool)) return [];
+
+    return pool
+      .map((item) => typeof item === 'string' ? item.trim() : '')
+      .filter(Boolean);
+  }
+
+  function normalizeMessagePoolMap(poolMap) {
+    if (!poolMap || Array.isArray(poolMap) || typeof poolMap !== 'object') return {};
+
+    const result = {};
+    Object.keys(poolMap).forEach((key) => {
+      const normalizedPool = normalizeMessagePool(poolMap[key]);
+      if (normalizedPool.length) {
+        result[key] = normalizedPool;
+      }
+    });
+    return result;
+  }
+
+  function pickMessageFromMap(poolMap, emotion) {
+    if (!poolMap || typeof poolMap !== 'object') return '';
+    const directPool = normalizeMessagePool(poolMap[emotion]);
+    if (directPool.length) {
+      return pickMessage(directPool);
+    }
+
+    const mergedPool = flattenMessagePoolMap(poolMap);
+    return pickMessage(mergedPool);
+  }
+
+  function flattenMessagePoolMap(poolMap) {
+    if (!poolMap || typeof poolMap !== 'object') return [];
+
+    const mergedPool = [];
+    Object.keys(poolMap).forEach((key) => {
+      const normalizedPool = normalizeMessagePool(poolMap[key]);
+      normalizedPool.forEach((message) => mergedPool.push(message));
+    });
+    return mergedPool;
+  }
+
+  function hasMessagePoolMap(poolMap) {
+    return flattenMessagePoolMap(poolMap).length > 0;
+  }
+
+  function cloneMessagePoolMap(poolMap) {
+    const clone = {};
+    Object.keys(poolMap || {}).forEach((key) => {
+      clone[key] = normalizeMessagePool(poolMap[key]);
+    });
+    return clone;
+  }
+
+  function pickRandomItem(items) {
+    if (!Array.isArray(items) || !items.length) return null;
+    return items[Math.floor(Math.random() * items.length)] || null;
   }
 })();
