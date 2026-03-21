@@ -6,6 +6,7 @@
   const PARAMS_PATH = '/live2d_models/sayaka/params.json';
   const CONTAINER_ID = 'live2d-widget-container';
   const CANVAS_ID = 'live2d-canvas';
+  const HIT_AREA_ID = 'live2d-hit-area';
   const SCRIPT_SOURCES = [
     '/js/live2dcubismcore.min.js?v=1.0.1',
     '/js/pixi.min.js?v=6.5.2',
@@ -18,6 +19,9 @@
   const VOICE_FALLBACK_SOURCES = ['/audio/sayaka_baka.mp3'];
   const STATE_STORAGE_KEY = 'sayaka-live2d-widget-state-v1';
   const GREETING_COOLDOWN_MS = 10 * 60 * 1000;
+  const HIT_AREA_PADDING_PX = 10;
+  const HIT_AREA_SYNC_INTERVAL_MS = 80;
+  const HIT_AREA_MIN_OPACITY = 0.05;
   const DEFAULT_PARAMS = {
     modelScale: 1.3
   };
@@ -220,6 +224,7 @@
 
       app.stage.addChild(model);
       layoutModel(model, view.size.width, view.size.height, params);
+      updateInteractionRegion(model, view);
       bindInteractions(model, view);
 
       const resize = debounce(() => {
@@ -236,6 +241,7 @@
         app.renderer.resize(nextSize.width, nextSize.height);
         constrainContainerPosition(view.container);
         layoutModel(model, nextSize.width, nextSize.height, params);
+        updateInteractionRegion(model, view);
       }, 100);
 
       window.addEventListener('resize', resize);
@@ -266,6 +272,7 @@
     const savedState = loadWidgetState();
     const container = document.createElement('div');
     const canvas = document.createElement('canvas');
+    const hitArea = document.createElement('div');
     const bubble = document.createElement('div');
     const initialLeft = clamp(
       Number.isFinite(savedState.left) ? savedState.left : 0,
@@ -289,9 +296,24 @@
       width: '100%',
       height: '100%',
       display: 'block',
-      pointerEvents: 'auto',
-      cursor: 'pointer',
+      pointerEvents: 'none',
       touchAction: 'none'
+    });
+
+    hitArea.id = HIT_AREA_ID;
+    Object.assign(hitArea.style, {
+      position: 'absolute',
+      left: '0',
+      top: '0',
+      width: '0',
+      height: '0',
+      display: 'none',
+      pointerEvents: 'auto',
+      cursor: 'default',
+      touchAction: 'none',
+      userSelect: 'none',
+      WebkitTapHighlightColor: 'transparent',
+      clipPath: 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
     });
 
     Object.assign(bubble.style, {
@@ -315,10 +337,11 @@
     });
 
     container.appendChild(canvas);
+    container.appendChild(hitArea);
     container.appendChild(bubble);
     document.body.appendChild(container);
 
-    return { container, canvas, bubble, size };
+    return { container, canvas, hitArea, bubble, size };
   }
 
   function layoutModel(model, width, height, params) {
@@ -334,23 +357,32 @@
 
   function bindInteractions(model, view) {
     const canvas = view.canvas;
+    const hitArea = view.hitArea;
     const container = view.container;
     const bubble = view.bubble;
     const animationCatalog = getAnimationCatalog(model);
     const widgetConfig = getLive2DWidgetConfig();
     const voicePlayer = createVoicePlayer();
     let pointerDown = false;
+    let pointerStartedOnModel = false;
     let dragged = false;
     let dragStartX = 0;
     let originLeft = 0;
     let bubbleTimer = 0;
     let idleTimer = 0;
     let tapCount = 0;
+    let interactionRegionFrame = 0;
+    let lastInteractionRegionSyncAt = 0;
 
+    syncInteractionRegion(performance.now());
     scheduleIdleReaction();
     maybePlayGreeting();
 
-    canvas.addEventListener('pointermove', (event) => {
+    hitArea.addEventListener('pointermove', (event) => {
+      const point = getCanvasPointerPosition(event, canvas);
+      const isStrictHit = pointerStartedOnModel || isModelMeshHit(model, point.x, point.y);
+      hitArea.style.cursor = pointerDown ? 'grabbing' : (isStrictHit ? 'pointer' : 'default');
+
       if (pointerDown) {
         const deltaX = event.clientX - dragStartX;
         if (!dragged && Math.abs(deltaX) > 4) {
@@ -362,34 +394,54 @@
         }
       }
 
-      focusPointer(event);
+      if (!isStrictHit) return;
+      focusPointer(point);
     });
 
-    canvas.addEventListener('pointerdown', (event) => {
+    hitArea.addEventListener('pointerdown', (event) => {
+      const point = getCanvasPointerPosition(event, canvas);
+      if (!isModelMeshHit(model, point.x, point.y)) {
+        pointerStartedOnModel = false;
+        hitArea.style.cursor = 'default';
+        return;
+      }
+
       pointerDown = true;
+      pointerStartedOnModel = true;
       dragged = false;
       dragStartX = event.clientX;
       originLeft = parseFloat(container.style.left) || 0;
+      hitArea.style.cursor = 'grabbing';
       scheduleIdleReaction();
+      event.preventDefault();
 
-      if (canvas.setPointerCapture) {
-        canvas.setPointerCapture(event.pointerId);
+      if (hitArea.setPointerCapture) {
+        hitArea.setPointerCapture(event.pointerId);
       }
     });
 
-    canvas.addEventListener('pointerup', (event) => {
+    hitArea.addEventListener('pointerup', (event) => {
       finishPointer(event, true);
     });
 
-    canvas.addEventListener('pointercancel', (event) => {
+    hitArea.addEventListener('pointercancel', (event) => {
       finishPointer(event, false);
     });
 
-    canvas.addEventListener('lostpointercapture', () => {
+    hitArea.addEventListener('pointerleave', () => {
+      if (!pointerDown) {
+        hitArea.style.cursor = 'default';
+      }
+    });
+
+    hitArea.addEventListener('lostpointercapture', () => {
       pointerDown = false;
+      pointerStartedOnModel = false;
+      hitArea.style.cursor = 'default';
     });
 
     window.addEventListener('beforeunload', () => {
+      window.cancelAnimationFrame(interactionRegionFrame);
       clearTimeout(idleTimer);
       clearTimeout(bubbleTimer);
       voicePlayer.pause();
@@ -407,17 +459,22 @@
 
     function finishPointer(event, shouldTap) {
       const wasDragged = dragged;
+      const hadStrictHit = pointerStartedOnModel;
       pointerDown = false;
+      pointerStartedOnModel = false;
       dragged = false;
+      hitArea.style.cursor = 'default';
 
-      if (canvas.releasePointerCapture && canvas.hasPointerCapture && canvas.hasPointerCapture(event.pointerId)) {
-        canvas.releasePointerCapture(event.pointerId);
+      if (hitArea.releasePointerCapture && hitArea.hasPointerCapture && hitArea.hasPointerCapture(event.pointerId)) {
+        hitArea.releasePointerCapture(event.pointerId);
       }
 
-      if (!shouldTap || wasDragged) return;
+      if (!shouldTap || wasDragged || !hadStrictHit) return;
+
+      const point = getCanvasPointerPosition(event, canvas);
+      if (!isModelMeshHit(model, point.x, point.y)) return;
 
       if (typeof model.tap === 'function') {
-        const point = getCanvasPointerPosition(event);
         model.tap(point.x, point.y);
       }
 
@@ -432,24 +489,24 @@
       triggerReaction('tap');
     }
 
-    function focusPointer(event) {
+    function focusPointer(point) {
       if (typeof model.focus !== 'function') return;
-      const point = getCanvasPointerPosition(event);
       model.focus(point.x, point.y);
-    }
-
-    function getCanvasPointerPosition(event) {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
-      };
     }
 
     function updateContainerLeft(nextLeft) {
       const clampedLeft = clamp(nextLeft, -container.offsetWidth * 0.35, window.innerWidth - container.offsetWidth * 0.65);
       container.style.left = clampedLeft + 'px';
       saveWidgetState({ left: clampedLeft });
+    }
+
+    function syncInteractionRegion(frameTime) {
+      if (!container.isConnected) return;
+      if (!lastInteractionRegionSyncAt || frameTime - lastInteractionRegionSyncAt >= HIT_AREA_SYNC_INTERVAL_MS) {
+        updateInteractionRegion(model, view);
+        lastInteractionRegionSyncAt = frameTime;
+      }
+      interactionRegionFrame = window.requestAnimationFrame(syncInteractionRegion);
     }
 
     function triggerReaction(type, options) {
@@ -582,6 +639,230 @@
       bubble.style.opacity = '0';
       bubble.style.transform = 'translate3d(0, 8px, 0)';
     }
+  }
+
+  function updateInteractionRegion(model, view) {
+    const hitArea = view && view.hitArea;
+    if (!hitArea) return;
+
+    const bounds = getModelCanvasMeshBounds(model);
+    if (!bounds) {
+      hitArea.style.display = 'none';
+      return;
+    }
+
+    const containerWidth = view.container.clientWidth || view.size.width || 0;
+    const containerHeight = view.container.clientHeight || view.size.height || 0;
+    const paddedBounds = padRect(bounds, HIT_AREA_PADDING_PX, containerWidth, containerHeight);
+    if (paddedBounds.width <= 0 || paddedBounds.height <= 0) {
+      hitArea.style.display = 'none';
+      return;
+    }
+
+    Object.assign(hitArea.style, {
+      display: 'block',
+      left: paddedBounds.x + 'px',
+      top: paddedBounds.y + 'px',
+      width: paddedBounds.width + 'px',
+      height: paddedBounds.height + 'px'
+    });
+  }
+
+  function getCanvasPointerPosition(event, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+  }
+
+  function getModelCanvasMeshBounds(model) {
+    const localBounds = getModelLocalMeshBounds(model);
+    if (!localBounds) return null;
+
+    const scaleX = Number(model && model.scale ? model.scale.x : 0);
+    const scaleY = Number(model && model.scale ? model.scale.y : 0);
+    if (!scaleX || !scaleY) return null;
+
+    return {
+      x: model.x + localBounds.x * scaleX,
+      y: model.y + localBounds.y * scaleY,
+      width: localBounds.width * scaleX,
+      height: localBounds.height * scaleY
+    };
+  }
+
+  function getModelLocalMeshBounds(model) {
+    const internalModel = model && model.internalModel;
+    const coreModel = internalModel && internalModel.coreModel;
+    if (!internalModel || !coreModel || typeof coreModel.getDrawableCount !== 'function' || typeof internalModel.getDrawableVertices !== 'function') {
+      return null;
+    }
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    const drawableCount = coreModel.getDrawableCount();
+
+    for (let index = 0; index < drawableCount; index += 1) {
+      if (!isDrawableInteractive(coreModel, index)) continue;
+
+      const vertices = internalModel.getDrawableVertices(index);
+      if (!vertices || vertices.length < 6) continue;
+
+      for (let vertexIndex = 0; vertexIndex < vertices.length; vertexIndex += 2) {
+        const x = vertices[vertexIndex];
+        const y = vertices[vertexIndex + 1];
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+
+    if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
+      return null;
+    }
+
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY
+    };
+  }
+
+  function isModelMeshHit(model, canvasX, canvasY) {
+    const localPoint = toModelLocalPoint(model, canvasX, canvasY);
+    if (!localPoint) return false;
+
+    const internalModel = model && model.internalModel;
+    const coreModel = internalModel && internalModel.coreModel;
+    if (!internalModel || !coreModel || typeof coreModel.getDrawableCount !== 'function' || typeof internalModel.getDrawableVertices !== 'function') {
+      return false;
+    }
+
+    const drawableCount = coreModel.getDrawableCount();
+    for (let index = 0; index < drawableCount; index += 1) {
+      if (!isDrawableInteractive(coreModel, index)) continue;
+
+      const vertices = internalModel.getDrawableVertices(index);
+      if (!vertices || vertices.length < 6 || !isPointInVertexBounds(localPoint.x, localPoint.y, vertices)) {
+        continue;
+      }
+
+      const vertexIndices = typeof coreModel.getDrawableVertexIndices === 'function'
+        ? coreModel.getDrawableVertexIndices(index)
+        : null;
+
+      if (vertexIndices && vertexIndices.length >= 3) {
+        for (let triangleIndex = 0; triangleIndex < vertexIndices.length; triangleIndex += 3) {
+          const a = vertexIndices[triangleIndex] * 2;
+          const b = vertexIndices[triangleIndex + 1] * 2;
+          const c = vertexIndices[triangleIndex + 2] * 2;
+          if (
+            isPointInTriangle(
+              localPoint.x,
+              localPoint.y,
+              vertices[a], vertices[a + 1],
+              vertices[b], vertices[b + 1],
+              vertices[c], vertices[c + 1]
+            )
+          ) {
+            return true;
+          }
+        }
+        continue;
+      }
+
+      for (let vertexIndex = 4; vertexIndex < vertices.length; vertexIndex += 2) {
+        if (
+          isPointInTriangle(
+            localPoint.x,
+            localPoint.y,
+            vertices[0], vertices[1],
+            vertices[vertexIndex - 2], vertices[vertexIndex - 1],
+            vertices[vertexIndex], vertices[vertexIndex + 1]
+          )
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  function toModelLocalPoint(model, canvasX, canvasY) {
+    const scaleX = Number(model && model.scale ? model.scale.x : 0);
+    const scaleY = Number(model && model.scale ? model.scale.y : 0);
+    if (!scaleX || !scaleY) return null;
+
+    return {
+      x: (canvasX - model.x) / scaleX,
+      y: (canvasY - model.y) / scaleY
+    };
+  }
+
+  function isDrawableInteractive(coreModel, index) {
+    if (!coreModel) return false;
+    if (typeof coreModel.getDrawableOpacity === 'function' && coreModel.getDrawableOpacity(index) <= HIT_AREA_MIN_OPACITY) {
+      return false;
+    }
+    if (typeof coreModel.getDrawableTextureIndices === 'function' && coreModel.getDrawableTextureIndices(index) < 0) {
+      return false;
+    }
+    if (typeof coreModel.getDrawableVertexCount === 'function' && coreModel.getDrawableVertexCount(index) < 3) {
+      return false;
+    }
+    return true;
+  }
+
+  function isPointInVertexBounds(x, y, vertices) {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (let index = 0; index < vertices.length; index += 2) {
+      minX = Math.min(minX, vertices[index]);
+      minY = Math.min(minY, vertices[index + 1]);
+      maxX = Math.max(maxX, vertices[index]);
+      maxY = Math.max(maxY, vertices[index + 1]);
+    }
+
+    return x >= minX && x <= maxX && y >= minY && y <= maxY;
+  }
+
+  function isPointInTriangle(px, py, ax, ay, bx, by, cx, cy) {
+    const ab = crossProduct(px, py, ax, ay, bx, by);
+    const bc = crossProduct(px, py, bx, by, cx, cy);
+    const ca = crossProduct(px, py, cx, cy, ax, ay);
+    const hasNegative = ab < 0 || bc < 0 || ca < 0;
+    const hasPositive = ab > 0 || bc > 0 || ca > 0;
+    return !(hasNegative && hasPositive);
+  }
+
+  function crossProduct(px, py, ax, ay, bx, by) {
+    return (px - bx) * (ay - by) - (ax - bx) * (py - by);
+  }
+
+  function padRect(bounds, padding, maxWidth, maxHeight) {
+    const safeMaxWidth = Number.isFinite(maxWidth) && maxWidth > 0 ? maxWidth : bounds.x + bounds.width + padding;
+    const safeMaxHeight = Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : bounds.y + bounds.height + padding;
+    const left = clamp(bounds.x - padding, 0, safeMaxWidth);
+    const top = clamp(bounds.y - padding, 0, safeMaxHeight);
+    const right = clamp(bounds.x + bounds.width + padding, 0, safeMaxWidth);
+    const bottom = clamp(bounds.y + bounds.height + padding, 0, safeMaxHeight);
+
+    return {
+      x: left,
+      y: top,
+      width: Math.max(0, right - left),
+      height: Math.max(0, bottom - top)
+    };
   }
 
   // ---- Model assets -------------------------------------------------------
