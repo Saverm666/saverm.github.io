@@ -14,7 +14,7 @@
   const MODEL_SCALE = 0.24;
   const DEFAULT_BOTTOM_OFFSET = 8;
   const EXTRA_DROP_PX = 35;
-  const BUBBLE_TOP_OFFSET = 254;
+  const BUBBLE_TOP_OFFSET = 204;
   const VOICE_FALLBACK_SOURCES = ['/audio/sayaka_baka.mp3'];
   const STATE_STORAGE_KEY = 'sayaka-live2d-widget-state-v1';
   const GREETING_COOLDOWN_MS = 10 * 60 * 1000;
