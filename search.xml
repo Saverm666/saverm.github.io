@@ -10,4 +10,25 @@
         <tag>杂项</tag>
       </tags>
   </entry>
+  <entry>
+    <title>被 GPT 和 Chrome 气死...</title>
+    <url>/2026/03/21/%E8%A2%ABGPT%E5%92%8CChrome%E6%B0%94%E6%AD%BB/</url>
+    <content><![CDATA[<p>不知道你们喜不喜欢用 Notion 记笔记。</p>
+<p>我个人很喜欢使用 Notion 记非数理的笔记，比如论文或者是一些课内的期末复习笔记。<br>最近正好有很多论文要看，我每天高强度使用 Notion，但是快被一些问题气吐血了。</p>
+<p>Notion 的公式块快捷键是 “Ctrl + Shift + E”；<br>而 Chrome 退出当前浏览器的快捷键是 “Ctrl + Shift + W”；<br>当我今天无数次误触红温之后，我选择整个插件来整治一下…</p>
+<p>正好 GPT 还有个硬伤：没法快捷地复制 LaTeX 公式。（Gemini 还有 Voyager 用，GPT 没人管管吗）<br>之前在 Chrome 扩展商店找的扩展都有这样那样的问题，今天翻了半天，找到一个油猴插件，支持快捷复制和强制 “Ctrl + Enter” 发送消息。</p>
+<p>于是，我把它的代码偷了过来，然后修改了一些逻辑：</p>
+<ul>
+<li>把过度的检测 LaTeX 逻辑收缩到真正有用的逻辑上；</li>
+<li>把两个功能做成可选项；</li>
+<li>增加 Chrome 在 Notion 界面时快捷退出的弹窗确认；</li>
+<li>支持三种格式的 LaTeX 公式导出。</li>
+</ul>
+<p>插件的下载链接：<a class="link"   href="https://github.com/Saverm666/GPTLaTeXCopy" >GPTLaTeXCopy<i class="fas fa-external-link-alt"></i></a></p>
+<p>由于我本人完全不懂前端，代码都是由 Codex 使用 GPT-5.4 写的，如果有人想优化代码，或者想维护这个东西，欢迎联系我~</p>
+]]></content>
+      <tags>
+        <tag>插件</tag>
+      </tags>
+  </entry>
 </search>
